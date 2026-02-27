@@ -134,17 +134,39 @@ async function connectSocket(
     }
 
     if (connection === 'open') {
-      fs.writeFileSync(STATUS_FILE, 'authenticated');
       // Clean up QR file now that we're connected
       try {
         fs.unlinkSync(QR_FILE);
       } catch {}
-      console.log('\n✓ Successfully authenticated with WhatsApp!');
-      console.log('  Credentials saved to store/auth/');
-      console.log('  You can now start the NanoClaw service.\n');
+      console.log('\n✓ Connected to WhatsApp — waiting for registration...');
 
-      // Give it a moment to save credentials, then exit
-      setTimeout(() => process.exit(0), 1000);
+      // Wait for registration to complete before declaring success.
+      // The creds.update event sets registered=true after the multi-device
+      // handshake finishes, which can take several seconds after connection opens.
+      const checkRegistered = setInterval(() => {
+        try {
+          const creds = JSON.parse(
+            fs.readFileSync(path.join(AUTH_DIR, 'creds.json'), 'utf-8'),
+          );
+          if (creds.registered) {
+            clearInterval(checkRegistered);
+            fs.writeFileSync(STATUS_FILE, 'authenticated');
+            console.log('✓ Registration complete! Credentials saved to store/auth/');
+            console.log('  You can now start the NanoClaw service.\n');
+            setTimeout(() => process.exit(0), 500);
+          }
+        } catch {
+          // creds.json not written yet, keep waiting
+        }
+      }, 500);
+
+      // Safety timeout — if registration doesn't complete in 30s, exit anyway
+      setTimeout(() => {
+        clearInterval(checkRegistered);
+        fs.writeFileSync(STATUS_FILE, 'authenticated');
+        console.log('✓ Authentication saved (registration still pending).');
+        process.exit(0);
+      }, 30000);
     }
   });
 

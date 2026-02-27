@@ -2,7 +2,7 @@
  * Step: groups — Connect to WhatsApp, fetch group metadata, write to DB.
  * Replaces 05-sync-groups.sh + 05b-list-groups.sh
  */
-import { execSync } from 'child_process';
+import { execFileSync, execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
@@ -90,7 +90,7 @@ async function syncGroups(projectRoot: string): Promise<void> {
   let syncOk = false;
   try {
     const syncScript = `
-import makeWASocket, { useMultiFileAuthState, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
+import makeWASocket, { useMultiFileAuthState, makeCacheableSignalKeyStore, Browsers, fetchLatestWaWebVersion } from '@whiskeysockets/baileys';
 import pino from 'pino';
 import path from 'path';
 import fs from 'fs';
@@ -114,8 +114,12 @@ const upsert = db.prepare(
 );
 
 const { state, saveCreds } = await useMultiFileAuthState(authDir);
+const { version } = await fetchLatestWaWebVersion({}).catch(() => ({ version: undefined }));
+
+let syncDone = false;
 
 const sock = makeWASocket({
+  version,
   auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, logger) },
   printQRInTerminal: false,
   logger,
@@ -142,6 +146,7 @@ sock.ev.on('connection.update', async (update) => {
         }
       }
       console.log('SYNCED:' + count);
+      syncDone = true;
     } catch (err) {
       console.error('FETCH_ERROR:' + err.message);
     } finally {
@@ -151,6 +156,7 @@ sock.ev.on('connection.update', async (update) => {
       process.exit(0);
     }
   } else if (update.connection === 'close') {
+    if (syncDone) return;
     clearTimeout(timeout);
     console.error('CONNECTION_CLOSED');
     process.exit(1);
@@ -158,8 +164,9 @@ sock.ev.on('connection.update', async (update) => {
 });
 `;
 
-    const output = execSync(
-      `node --input-type=module -e ${JSON.stringify(syncScript)}`,
+    const output = execFileSync(
+      'node',
+      ['--input-type=module', '-e', syncScript],
       {
         cwd: projectRoot,
         encoding: 'utf-8',
