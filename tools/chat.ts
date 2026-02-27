@@ -18,7 +18,7 @@ const IPC_DIR = path.join(PROJECT_ROOT, 'data', 'ipc', 'main', 'messages');
 function getMainJid(): string {
   const db = new Database(DB_PATH, { readonly: true });
   const row = db
-    .prepare('SELECT jid FROM registered_groups WHERE name = ?')
+    .prepare('SELECT jid FROM registered_groups WHERE folder = ?')
     .get('main') as { jid: string } | undefined;
   db.close();
   if (!row) {
