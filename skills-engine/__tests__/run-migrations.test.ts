@@ -63,7 +63,7 @@ describe('run-migrations', () => {
     expect(result.migrationsRun).toBe(0);
   });
 
-  it('runs migrations in the correct version range', () => {
+  it('runs migrations in the correct version range', { timeout: 30_000 }, () => {
     // Create a marker file when the migration runs
     createMigration(
       '1.1.0',

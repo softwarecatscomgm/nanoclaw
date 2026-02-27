@@ -4,8 +4,8 @@ set -euo pipefail
 # Fetch upstream NanoClaw and extract to a temp directory.
 # Outputs a structured status block for machine parsing.
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" >/dev/null && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../.." >/dev/null && pwd)"
 cd "$PROJECT_ROOT"
 
 # Determine the correct remote
