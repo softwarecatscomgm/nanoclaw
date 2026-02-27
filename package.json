@@ -22,12 +22,15 @@
     "restart": "launchctl kickstart -k gui/$(id -u)/com.nanoclaw",
     "status": "launchctl list 2>/dev/null | grep nanoclaw",
     "deploy": "npm run build && npm run restart",
+    "docker": "container/build.sh",
+    "docker:push": "container/build.sh --push",
     "clean:js": "scripts/clean-js-artifacts.sh --delete --verbose"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
     "better-sqlite3": "^11.8.1",
     "cron-parser": "^5.5.0",
+    "googleapis": "^144.0.0",
     "pino": "^9.6.0",
     "pino-pretty": "^13.0.0",
     "qrcode": "^1.5.4",
