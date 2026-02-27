@@ -21,7 +21,8 @@
     "postversion": "git push origin main --tags",
     "restart": "launchctl kickstart -k gui/$(id -u)/com.nanoclaw",
     "status": "launchctl list 2>/dev/null | grep nanoclaw",
-    "deploy": "npm run build && npm run restart"
+    "deploy": "npm run build && npm run restart",
+    "clean:js": "scripts/clean-js-artifacts.sh --delete --verbose"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",

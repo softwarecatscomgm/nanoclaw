@@ -151,7 +151,9 @@ async function connectSocket(
           if (creds.registered) {
             clearInterval(checkRegistered);
             fs.writeFileSync(STATUS_FILE, 'authenticated');
-            console.log('✓ Registration complete! Credentials saved to store/auth/');
+            console.log(
+              '✓ Registration complete! Credentials saved to store/auth/',
+            );
             console.log('  You can now start the NanoClaw service.\n');
             setTimeout(() => process.exit(0), 500);
           }

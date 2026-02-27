@@ -3,6 +3,8 @@ node_modules/
 .npm-cache/
 # Build output
 dist/
+setup/*.js
+tools/*.js
 
 # Local data & auth
 store/
