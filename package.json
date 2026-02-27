@@ -27,6 +27,7 @@
     "clean:js": "scripts/clean-js-artifacts.sh --delete --verbose"
   },
   "dependencies": {
+    "@slack/bolt": "^4.6.0",
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
     "better-sqlite3": "^11.8.1",
     "cron-parser": "^5.5.0",
