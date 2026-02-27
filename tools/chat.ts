@@ -113,7 +113,7 @@ function ask(text: string, timeoutSeconds: number): void {
   const id = `cli-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   const timestamp = new Date().toISOString();
 
-  const prompt = `[Echo the following message on the first line of your response, then after a blank line write your reply]\n\n${text}`;
+  const prompt = `IMPORTANT: Your response MUST start with "> ${text}" on the first line, followed by a blank line, then your answer.\n\n${text}`;
   db.prepare(
     `INSERT OR REPLACE INTO messages (id, chat_jid, sender, sender_name, content, timestamp, is_from_me, is_bot_message)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
