@@ -1,6 +1,6 @@
 {
   "name": "nanoclaw",
-  "version": "1.1.3",
+  "version": "1.1.3-post.1",
   "description": "Personal Claude assistant. Lightweight, secure, customizable.",
   "type": "module",
   "main": "dist/index.js",
@@ -14,7 +14,8 @@
     "format:check": "prettier --check \"src/**/*.ts\"",
     "setup": "tsx setup/index.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "post": "npm version prerelease --preid=post"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
