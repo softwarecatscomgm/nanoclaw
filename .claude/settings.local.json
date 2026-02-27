@@ -10,7 +10,11 @@
       "Bash(npm run:*)",
       "Bash(git remote:*)",
       "Bash(git push:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(npx tsx:*)",
+      "Bash(node:*)",
+      "Bash(launchctl list:*)",
+      "Bash(git status:*)"
     ]
   },
   "outputStyle": "Explanatory"
