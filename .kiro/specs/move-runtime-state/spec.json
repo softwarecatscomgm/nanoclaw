@@ -1,0 +1,12 @@
+{
+  "featureName": "move-runtime-state",
+  "description": "Move all runtime state (store/, data/, logs/) from the project root to ~/.config/nanoclaw/ so agents cannot read host state through the read-only project mount",
+  "language": "en",
+  "createdAt": "2026-02-27T09:00:00Z",
+  "phases": {
+    "requirements": "complete",
+    "design": "complete",
+    "tasks": "not_started"
+  },
+  "planFile": "docs/plans/move-runtime-state.md"
+}
