@@ -18,7 +18,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "post": "npm version prerelease --preid=post",
-    "postversion": "git push origin main --tags"
+    "postversion": "git push origin main --tags",
+    "restart": "launchctl kickstart -k gui/$(id -u)/com.nanoclaw",
+    "deploy": "npm run build && npm run restart"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
