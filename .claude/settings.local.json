@@ -19,7 +19,11 @@
       "Bash(docker exec:*)",
       "Bash(docker ps:*)",
       "Bash(git ls-tree:*)",
-      "Bash(gh pr:*)"
+      "Bash(gh pr:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npm test:*)",
+      "Bash(git:*)",
+      "Bash(gh api:*)"
     ]
   },
   "outputStyle": "Explanatory"
