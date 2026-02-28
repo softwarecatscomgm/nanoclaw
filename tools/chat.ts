@@ -15,17 +15,22 @@ const PROJECT_ROOT = path.resolve(import.meta.dirname, '..');
 const DB_PATH = path.join(PROJECT_ROOT, 'store', 'messages.db');
 const IPC_DIR = path.join(PROJECT_ROOT, 'data', 'ipc', 'main', 'messages');
 
-function getMainJid(): string {
+function getMainJids(): string[] {
   const db = new Database(DB_PATH, { readonly: true });
-  const row = db
+  const rows = db
     .prepare('SELECT jid FROM registered_groups WHERE folder = ?')
-    .get('main') as { jid: string } | undefined;
+    .all('main') as { jid: string }[];
   db.close();
-  if (!row) {
+  if (rows.length === 0) {
     console.error('No main group registered. Run setup first.');
     process.exit(1);
   }
-  return row.jid;
+  return rows.map((r) => r.jid);
+}
+
+/** Returns the first main JID — used for sending (IPC / message injection). */
+function getMainJid(): string {
+  return getMainJids()[0];
 }
 
 function send(text: string): void {
@@ -58,50 +63,60 @@ interface Message {
   is_bot_message: number;
 }
 
+function channelLabel(jid: string): string {
+  if (jid.startsWith('slack:')) return 'slack';
+  if (jid.endsWith('@g.us') || jid.endsWith('@s.whatsapp.net')) return 'wa';
+  if (jid.startsWith('gmail:')) return 'gmail';
+  return 'other';
+}
+
 function read(limit: number): void {
-  const jid = getMainJid();
+  const jids = getMainJids();
   const db = new Database(DB_PATH, { readonly: true });
+  const placeholders = jids.map(() => '?').join(',');
   const rows = db
     .prepare(
-      `SELECT sender_name, content, timestamp, is_from_me, is_bot_message
-       FROM messages WHERE chat_jid = ?
+      `SELECT chat_jid, sender_name, content, timestamp, is_from_me, is_bot_message
+       FROM messages WHERE chat_jid IN (${placeholders})
        ORDER BY timestamp DESC LIMIT ?`,
     )
-    .all(jid, limit) as Message[];
+    .all(...jids, limit) as (Message & { chat_jid: string })[];
   db.close();
 
   for (const row of rows.reverse()) {
     const tag = row.is_bot_message ? 'F3' : row.is_from_me ? 'You' : (row.sender_name || '?');
     const time = new Date(row.timestamp).toLocaleTimeString();
-    // Strip duplicate name prefix from bot messages (e.g. "F3: Hello" → "Hello")
+    const ch = channelLabel(row.chat_jid);
     const content = row.is_bot_message ? row.content.replace(/^\S+:\s*/, '') : row.content;
-    console.log(`[${time}] ${tag}: ${content}`);
+    console.log(`[${time}] [${ch}] ${tag}: ${content}`);
   }
 }
 
 function tail(pollSeconds: number): void {
-  const jid = getMainJid();
+  const jids = getMainJids();
   let lastTimestamp = new Date().toISOString();
 
   console.log('Watching for new messages... (Ctrl+C to stop)\n');
   read(5); // show last 5 for context
 
+  const placeholders = jids.map(() => '?').join(',');
   setInterval(() => {
     const db = new Database(DB_PATH, { readonly: true });
     const rows = db
       .prepare(
-        `SELECT sender_name, content, timestamp, is_from_me, is_bot_message
-         FROM messages WHERE chat_jid = ? AND timestamp > ?
+        `SELECT chat_jid, sender_name, content, timestamp, is_from_me, is_bot_message
+         FROM messages WHERE chat_jid IN (${placeholders}) AND timestamp > ?
          ORDER BY timestamp ASC`,
       )
-      .all(jid, lastTimestamp) as Message[];
+      .all(...jids, lastTimestamp) as (Message & { chat_jid: string })[];
     db.close();
 
     for (const row of rows) {
       const tag = row.is_bot_message ? 'F3' : row.is_from_me ? 'You' : (row.sender_name || '?');
       const time = new Date(row.timestamp).toLocaleTimeString();
+      const ch = channelLabel(row.chat_jid);
       const content = row.is_bot_message ? row.content.replace(/^\S+:\s*/, '') : row.content;
-      console.log(`[${time}] ${tag}: ${content}`);
+      console.log(`[${time}] [${ch}] ${tag}: ${content}`);
       lastTimestamp = row.timestamp;
     }
   }, pollSeconds * 1000);
@@ -122,16 +137,18 @@ function ask(text: string, timeoutSeconds: number): void {
 
   console.log(`You: ${text}`);
 
+  const jids = getMainJids();
+  const placeholders = jids.map(() => '?').join(',');
   const deadline = Date.now() + timeoutSeconds * 1000;
   const poll = setInterval(() => {
     const rdb = new Database(DB_PATH, { readonly: true });
     const row = rdb
       .prepare(
         `SELECT content, timestamp FROM messages
-         WHERE chat_jid = ? AND timestamp > ? AND is_bot_message = 1
+         WHERE chat_jid IN (${placeholders}) AND timestamp > ? AND is_bot_message = 1
          ORDER BY timestamp ASC LIMIT 1`,
       )
-      .get(jid, timestamp) as { content: string; timestamp: string } | undefined;
+      .get(...jids, timestamp) as { content: string; timestamp: string } | undefined;
     rdb.close();
 
     if (row) {

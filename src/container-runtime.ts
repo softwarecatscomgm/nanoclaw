@@ -3,6 +3,7 @@
  * All runtime-specific logic lives here so swapping runtimes means changing one file.
  */
 import { execSync } from 'child_process';
+import fs from 'fs';
 
 import { logger } from './logger.js';
 
@@ -27,34 +28,64 @@ export function ensureContainerRuntimeRunning(): void {
   try {
     execSync(`${CONTAINER_RUNTIME_BIN} info`, {
       stdio: 'pipe',
-      timeout: 10000,
+      timeout: 30000,
     });
     logger.debug('Container runtime already running');
   } catch (err) {
-    logger.error({ err }, 'Failed to reach container runtime');
-    console.error(
-      '\n╔════════════════════════════════════════════════════════════════╗',
-    );
-    console.error(
-      '║  FATAL: Container runtime failed to start                      ║',
-    );
-    console.error(
-      '║                                                                ║',
-    );
-    console.error(
-      '║  Agents cannot run without a container runtime. To fix:        ║',
-    );
-    console.error(
-      '║  1. Ensure Docker is installed and running                     ║',
-    );
-    console.error(
-      '║  2. Run: docker info                                           ║',
-    );
-    console.error(
-      '║  3. Restart NanoClaw                                           ║',
-    );
-    console.error(
-      '╚════════════════════════════════════════════════════════════════╝\n',
+    const errObj = err as {
+      code?: string;
+      status?: number;
+      signal?: string;
+      stderr?: Buffer;
+      stdout?: Buffer;
+    };
+    const stderr = errObj.stderr?.toString().trim() || '';
+    const stdout = errObj.stdout?.toString().trim() || '';
+
+    // Gather environment diagnostics
+    let whichDocker = '';
+    let socketExists = false;
+    try {
+      whichDocker = execSync('which docker', {
+        stdio: 'pipe',
+        encoding: 'utf-8',
+        timeout: 5000,
+      }).trim();
+    } catch {
+      whichDocker = '<not found in PATH>';
+    }
+    try {
+      socketExists = fs.existsSync('/var/run/docker.sock');
+    } catch {
+      /* ignore */
+    }
+    let dockerPs = '';
+    try {
+      dockerPs = execSync(`${CONTAINER_RUNTIME_BIN} ps --format '{{.Names}}: {{.Status}}'`, {
+        stdio: 'pipe',
+        encoding: 'utf-8',
+        timeout: 10000,
+      }).trim();
+    } catch (psErr) {
+      dockerPs = `<failed: ${(psErr as Error).message}>`;
+    }
+
+    logger.error(
+      {
+        errorCode: errObj.code,
+        exitStatus: errObj.status,
+        signal: errObj.signal,
+        stderr,
+        stdout: stdout.slice(0, 500),
+        dockerBin: whichDocker,
+        socketExists,
+        PATH: process.env.PATH,
+        HOME: process.env.HOME,
+        DOCKER_HOST: process.env.DOCKER_HOST || '<unset>',
+        DOCKER_CONTEXT: process.env.DOCKER_CONTEXT || '<unset>',
+        dockerPs,
+      },
+      'Container runtime check failed',
     );
     throw new Error('Container runtime is required but failed to start');
   }

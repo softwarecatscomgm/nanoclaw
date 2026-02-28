@@ -76,7 +76,7 @@ function createSchema(database: Database.Database): void {
     CREATE TABLE IF NOT EXISTS registered_groups (
       jid TEXT PRIMARY KEY,
       name TEXT NOT NULL,
-      folder TEXT NOT NULL UNIQUE,
+      folder TEXT NOT NULL,
       trigger_pattern TEXT NOT NULL,
       added_at TEXT NOT NULL,
       container_config TEXT,
@@ -125,6 +125,34 @@ function createSchema(database: Database.Database): void {
     );
   } catch {
     /* columns already exist */
+  }
+
+  // Drop UNIQUE constraint on registered_groups.folder so multiple JIDs
+  // (e.g. WhatsApp + Slack) can share the same group folder.
+  try {
+    const hasUnique = database
+      .prepare(
+        `SELECT sql FROM sqlite_master WHERE type='table' AND name='registered_groups'`,
+      )
+      .get() as { sql: string } | undefined;
+    if (hasUnique?.sql?.includes('UNIQUE')) {
+      database.exec(`
+        CREATE TABLE registered_groups_new (
+          jid TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          folder TEXT NOT NULL,
+          trigger_pattern TEXT NOT NULL,
+          added_at TEXT NOT NULL,
+          container_config TEXT,
+          requires_trigger INTEGER DEFAULT 1
+        );
+        INSERT INTO registered_groups_new SELECT * FROM registered_groups;
+        DROP TABLE registered_groups;
+        ALTER TABLE registered_groups_new RENAME TO registered_groups;
+      `);
+    }
+  } catch {
+    /* already migrated or table doesn't exist yet */
   }
 }
 
