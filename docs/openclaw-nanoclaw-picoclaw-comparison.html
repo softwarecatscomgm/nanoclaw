@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenClaw vs NanoClaw vs PicoClaw — Comparison</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --border: #2a2d3a;
+    --text: #e0e0e0;
+    --muted: #8b8fa3;
+    --accent-green: #4ade80;
+    --accent-yellow: #facc15;
+    --accent-red: #f87171;
+    --accent-blue: #60a5fa;
+    --accent-purple: #a78bfa;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 2rem; line-height: 1.6; }
+  h1 { font-size: 1.8rem; margin-bottom: 0.25rem; }
+  .subtitle { color: var(--muted); margin-bottom: 2rem; font-size: 0.95rem; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 2rem; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+  .card h2 { font-size: 1.3rem; margin-bottom: 0.15rem; }
+  .card .tagline { color: var(--muted); font-size: 0.85rem; margin-bottom: 1rem; }
+  .card .stats { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .stat { background: rgba(255,255,255,0.05); border-radius: 6px; padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+
+  .section-title { font-size: 1.2rem; margin: 2rem 0 1rem; color: var(--accent-blue); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; }
+  th { background: rgba(255,255,255,0.05); text-align: left; padding: 0.75rem 1rem; font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  td { padding: 0.75rem 1rem; border-top: 1px solid var(--border); font-size: 0.9rem; vertical-align: top; }
+  td:first-child { font-weight: 600; white-space: nowrap; width: 180px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+  .badge-green { background: rgba(74,222,128,0.15); color: var(--accent-green); }
+  .badge-yellow { background: rgba(250,204,21,0.15); color: var(--accent-yellow); }
+  .badge-red { background: rgba(248,113,113,0.15); color: var(--accent-red); }
+  .badge-blue { background: rgba(96,165,250,0.15); color: var(--accent-blue); }
+  .badge-purple { background: rgba(167,139,250,0.15); color: var(--accent-purple); }
+
+  .rec-box { background: var(--card); border: 2px solid var(--accent-blue); border-radius: 12px; padding: 1.5rem; margin-top: 2rem; }
+  .rec-box h3 { color: var(--accent-blue); margin-bottom: 0.75rem; font-size: 1.1rem; }
+  .rec-box p { margin-bottom: 0.5rem; }
+
+  .pro-con { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem; }
+  .pro-con div { font-size: 0.85rem; }
+  .pro-con ul { list-style: none; padding: 0; }
+  .pro-con li { padding: 0.25rem 0; }
+  .pro-con li::before { margin-right: 0.4rem; font-weight: bold; }
+  .pros li::before { content: "+"; color: var(--accent-green); }
+  .cons li::before { content: "−"; color: var(--accent-red); }
+
+  .footer-note { color: var(--muted); font-size: 0.8rem; margin-top: 2rem; text-align: center; }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+    .pro-con { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<h1>OpenClaw vs NanoClaw vs PicoClaw</h1>
+<p class="subtitle">Side-by-side comparison focused on Docker/sandboxing, safety, and where to invest your time — February 2026</p>
+
+<!-- Overview Cards -->
+<div class="grid">
+  <div class="card">
+    <h2>OpenClaw</h2>
+    <p class="tagline">The full-featured "life OS" — model-agnostic, massively popular, complex</p>
+    <div class="stats">
+      <span class="stat">⭐ ~199K stars</span>
+      <span class="stat">🍴 ~35K forks</span>
+      <span class="stat">📝 11,440+ commits</span>
+    </div>
+    <p style="font-size:0.85rem; color:var(--muted);">Originally "Clawdbot" by Peter Steinberger (PSPDFKit founder). Renamed after Anthropic trademark complaint. Supports Claude, GPT, Kimi 2.5, Gemini, and local models. WhatsApp, Slack, file system integrations. Persistent memory across sessions.</p>
+  </div>
+
+  <div class="card">
+    <h2>NanoClaw</h2>
+    <p class="tagline">Minimalist &amp; auditable — ~500 lines of TS, container-first security</p>
+    <div class="stats">
+      <span class="stat">📦 ~3,900 LOC total</span>
+      <span class="stat">🔒 Container-first</span>
+      <span class="stat">⚙️ Claude Agent SDK</span>
+    </div>
+    <p style="font-size:0.85rem; color:var(--muted);">Built on Anthropic's Agent SDK. Entire codebase fits in ~35K tokens — a coding agent can understand it all. MIT licensed. Supports WhatsApp, Telegram, Discord, Slack, Signal. Per-group isolated containers and memory.</p>
+  </div>
+
+  <div class="card">
+    <h2>PicoClaw</h2>
+    <p class="tagline">Ultra-lightweight Go binary — runs on $10 hardware, 10MB RAM</p>
+    <div class="stats">
+      <span class="stat">🚀 Single Go binary</span>
+      <span class="stat">💾 &lt;10MB RAM</span>
+      <span class="stat">⚡ &lt;1s boot</span>
+    </div>
+    <p style="font-size:0.85rem; color:var(--muted);">By Sipeed (RISC-V hardware company). Go rewrite of nanobot, 95% AI-driven migration. Targets edge/IoT deployments on hardware like LicheeRV-Nano. Supports Anthropic + OpenAI-compatible backends. Pre-v1.0 — early development.</p>
+  </div>
+</div>
+
+<!-- Docker & Sandboxing Comparison (Primary Focus) -->
+<h2 class="section-title">🐳 Docker &amp; Sandboxing — Detailed Comparison</h2>
+<table>
+  <thead>
+    <tr><th style="width:180px">Aspect</th><th>OpenClaw</th><th>NanoClaw</th><th>PicoClaw</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Container Support</td>
+      <td><span class="badge badge-green">Yes — Two Layers</span><br><strong>Layer 1:</strong> Run the entire OpenClaw gateway + CLI inside Docker via official Docker Compose setup (docker-setup.sh).<br><strong>Layer 2:</strong> Agent sandbox mode — individual tool executions run in additional isolated containers. Both can be combined.</td>
+      <td><span class="badge badge-green">Yes — Native</span><br>Apple Container (macOS) or Docker (Linux). Container-first architecture — agents run inside containers by default.</td>
+      <td><span class="badge badge-yellow">Partial</span><br>Docker Compose available for deploying PicoClaw itself, but no built-in container isolation for agent tool execution. Workspace sandbox only.</td>
+    </tr>
+    <tr>
+      <td>Full Docker Deploy</td>
+      <td><span class="badge badge-green">Official support</span><br>Docker Compose runs the openclaw-gateway container (ports 18789/18790) + openclaw-cli container. Volumes: ~/.openclaw (config, memory, API keys) and ~/openclaw/workspace (agent file access). Official image: alpine/openclaw. One-command setup via docker-setup.sh. This means the entire app never touches your host OS directly.</td>
+      <td><span class="badge badge-green">Inherent</span><br>The app itself is lightweight enough that running inside a container is trivial, but the design assumes the agent runtime is already containerized — there's no separate "full Docker" mode because container isolation IS the default architecture.</td>
+      <td><span class="badge badge-yellow">Basic</span><br>Can deploy PicoClaw itself in a Docker container, but this is just packaging — it doesn't add agent-level isolation inside.</td>
+    </tr>
+    <tr>
+      <td>Isolation Model</td>
+      <td><strong>When running fully in Docker:</strong> The gateway itself is containerized, so even the orchestration layer is isolated from your host. Agent sandbox containers then provide a second isolation layer — tool executions happen in their own ephemeral containers. This gives you defense-in-depth: even if an agent escapes its sandbox, it lands in the gateway container, not on your host.<br><br><strong>Without full Docker:</strong> Gateway runs on host; only non-primary agent tool calls are sandboxed. Primary agent still runs on host by default.</td>
+      <td>Every agent session gets its own container with isolated filesystem, IPC namespace, and process space. Host app code mounted read-only. Nothing persists after container destruction.</td>
+      <td>Workspace-level sandboxing — agent can only access configured workspace directory. No OS-level process isolation. On minimal hardware, container overhead would defeat the purpose.</td>
+    </tr>
+    <tr>
+      <td>What's Isolated</td>
+      <td><strong>Full Docker + Sandbox:</strong> Everything — gateway, config, agent tool execution all containerized. Dangerous bind sources blocked (docker.sock, /etc, /proc, /sys, /dev). Only ~/openclaw/workspace and ~/.openclaw mounted as volumes.<br><strong>Sandbox only:</strong> Tool execution (bash, file ops) in non-primary sessions.</td>
+      <td>Full agent runtime — filesystem, processes, IPC. Sensitive paths blocked by default (.ssh, .gnupg, .aws, .env, credentials). Only explicitly mounted directories accessible.</td>
+      <td>File access restricted to workspace directory. Commands execute on host or within Docker container if deployed that way.</td>
+    </tr>
+    <tr>
+      <td>Network Control</td>
+      <td><span class="badge badge-green">Strong</span><br>Sandbox containers have no network by default. Can use Squid egress proxy with allowlists. internal: true Docker flag prevents internet routing.</td>
+      <td><span class="badge badge-green">Configurable</span><br>Container networking configurable per agent. Mount allowlist prevents accidental exposure.</td>
+      <td><span class="badge badge-red">Limited</span><br>No built-in network isolation for agent execution. Health check endpoints added recently for container orchestration.</td>
+    </tr>
+    <tr>
+      <td>macOS Support</td>
+      <td>Docker Desktop required (heavier footprint on macOS)</td>
+      <td><span class="badge badge-green">Apple Container</span><br>Native Apple Container on macOS — fast, lightweight, optimized for Apple silicon. Docker as fallback.</td>
+      <td>Runs as native Go binary. Docker optional for deployment wrapper.</td>
+    </tr>
+    <tr>
+      <td>Setup Complexity</td>
+      <td><span class="badge badge-yellow">Medium–High</span><br>Many config options. Sandbox config is per-agent. Full hardening (Tailscale, Squid proxy, non-root) requires significant setup.</td>
+      <td><span class="badge badge-green">Low</span><br>Container isolation works out of the box. Apple Container auto-detected on macOS, Docker on Linux. Minimal config needed.</td>
+      <td><span class="badge badge-green">Low</span><br>Single binary, minimal config. But sandboxing is also minimal — less to configure because less is isolated.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Security Track Record -->
+<h2 class="section-title">🛡️ Security Track Record</h2>
+<table>
+  <thead>
+    <tr><th style="width:180px">Aspect</th><th>OpenClaw</th><th>NanoClaw</th><th>PicoClaw</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Known CVEs</td>
+      <td><span class="badge badge-red">CVE-2026-25253</span><br>Critical RCE via WebSocket origin header bypass (CVSS 8.8). 135K+ exposed instances found, 50K+ directly vulnerable.</td>
+      <td><span class="badge badge-green">None known</span><br>Small attack surface due to minimal codebase.</td>
+      <td><span class="badge badge-yellow">Pre-v1.0</span><br>Explicitly warns of unresolved network security issues. Not recommended for production.</td>
+    </tr>
+    <tr>
+      <td>Community Skills/Plugins</td>
+      <td><span class="badge badge-red">12% malicious</span><br>Security audit of ClawHub found 341 of ~2,857 community skills were malicious.</td>
+      <td>No centralized skill registry. You fork and modify the codebase directly. Smaller attack surface.</td>
+      <td>No plugin ecosystem yet. Basic functionality only.</td>
+    </tr>
+    <tr>
+      <td>Auditability</td>
+      <td><span class="badge badge-yellow">Difficult</span><br>Large, fast-moving codebase. 11K+ commits, many contributors. Hard for one person to audit.</td>
+      <td><span class="badge badge-green">Excellent</span><br>~3,900 LOC across 15 files. Entire source fits in ~35K tokens. A coding agent can read it all.</td>
+      <td><span class="badge badge-green">Good</span><br>Small Go codebase. Single binary. Relatively easy to review.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Features & Ecosystem -->
+<h2 class="section-title">⚡ Features &amp; Ecosystem</h2>
+<table>
+  <thead>
+    <tr><th style="width:180px">Feature</th><th>OpenClaw</th><th>NanoClaw</th><th>PicoClaw</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Model Support</td>
+      <td><span class="badge badge-green">Multi-model</span><br>Claude, GPT, Kimi 2.5, Gemini, local models (Ollama)</td>
+      <td><span class="badge badge-blue">Claude only</span><br>Built on Claude Agent SDK. Anthropic API required.</td>
+      <td><span class="badge badge-green">Multi-model</span><br>Anthropic + OpenAI-compatible backends. Ollama supported.</td>
+    </tr>
+    <tr>
+      <td>Messaging Platforms</td>
+      <td>WhatsApp, Slack, local filesystem</td>
+      <td>WhatsApp, Telegram, Discord, Slack, Signal, headless</td>
+      <td>Basic integrations — fewer platforms, focused on core functionality</td>
+    </tr>
+    <tr>
+      <td>Persistent Memory</td>
+      <td><span class="badge badge-green">Yes</span> — local memory persists for weeks</td>
+      <td><span class="badge badge-green">Yes</span> — per-group memory files</td>
+      <td><span class="badge badge-yellow">Basic</span> — workspace-level state</td>
+    </tr>
+    <tr>
+      <td>Scheduled Tasks</td>
+      <td>Yes — extensive job scheduling</td>
+      <td>Yes — built-in scheduled jobs</td>
+      <td>Limited automation capabilities</td>
+    </tr>
+    <tr>
+      <td>Community Size</td>
+      <td><span class="badge badge-green">Massive</span> — 199K stars, huge contributor base, fast-moving</td>
+      <td><span class="badge badge-yellow">Small</span> — niche but focused community</td>
+      <td><span class="badge badge-yellow">Small</span> — early stage, IoT-focused community</td>
+    </tr>
+    <tr>
+      <td>Customizability</td>
+      <td>Plugin/skill ecosystem (ClawHub). Large config surface. Many community extensions.</td>
+      <td>Fork-and-modify model. Entire codebase understandable by AI. One-shot most features.</td>
+      <td>Config-driven model additions. Go binary — requires Go knowledge to modify.</td>
+    </tr>
+    <tr>
+      <td>License</td>
+      <td>Open source (check specific license)</td>
+      <td>MIT — fully open</td>
+      <td>Open source (GitHub)</td>
+    </tr>
+    <tr>
+      <td>Cost</td>
+      <td>Free + API costs (can use cheap models like Kimi 2.5)</td>
+      <td>Free + Anthropic API costs only</td>
+      <td>Free + API costs (runs on $10 hardware)</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Pros and Cons -->
+<h2 class="section-title">⚖️ Pros &amp; Cons Summary</h2>
+<div class="grid">
+  <div class="card">
+    <h2>OpenClaw</h2>
+    <div class="pro-con">
+      <div class="pros"><strong style="color:var(--accent-green)">Pros</strong>
+        <ul>
+          <li>Most features and integrations</li>
+          <li>Largest community &amp; ecosystem</li>
+          <li>Model-agnostic (use cheap models)</li>
+          <li>Two-layer Docker: full app + agent sandbox</li>
+          <li>Fast-moving development</li>
+        </ul>
+      </div>
+      <div class="cons"><strong style="color:var(--accent-red)">Cons</strong>
+        <ul>
+          <li>Critical RCE vulnerability history</li>
+          <li>12% malicious community skills</li>
+          <li>Complex — hard to audit</li>
+          <li>Both layers opt-in, not default</li>
+          <li>Hardening requires significant effort</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>NanoClaw</h2>
+    <div class="pro-con">
+      <div class="pros"><strong style="color:var(--accent-green)">Pros</strong>
+        <ul>
+          <li>Container isolation by default</li>
+          <li>Tiny, auditable codebase</li>
+          <li>Apple Container on macOS (fast)</li>
+          <li>AI can understand entire codebase</li>
+          <li>Fork-friendly design philosophy</li>
+        </ul>
+      </div>
+      <div class="cons"><strong style="color:var(--accent-red)">Cons</strong>
+        <ul>
+          <li>Claude-only (no other models)</li>
+          <li>Fewer features out of the box</li>
+          <li>Small community — slower ecosystem</li>
+          <li>You build features yourself</li>
+          <li>Less documentation/tutorials</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>PicoClaw</h2>
+    <div class="pro-con">
+      <div class="pros"><strong style="color:var(--accent-green)">Pros</strong>
+        <ul>
+          <li>Runs on ultra-cheap hardware</li>
+          <li>Multi-model support</li>
+          <li>Single binary, fast boot</li>
+          <li>Great for edge/IoT</li>
+          <li>Tiny resource footprint</li>
+        </ul>
+      </div>
+      <div class="cons"><strong style="color:var(--accent-red)">Cons</strong>
+        <ul>
+          <li>No real container sandboxing</li>
+          <li>Pre-v1.0 — known security gaps</li>
+          <li>Limited features</li>
+          <li>Not for complex workflows</li>
+          <li>Smallest community</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recommendation -->
+<div class="rec-box">
+  <h3>💡 Recommendation — Given Your Focus on Docker/Safety</h3>
+  <p>Since Docker and sandboxing are your primary concern, and you've already been tinkering with NanoClaw, here's how I'd frame the decision:</p>
+  <p style="margin-top:0.75rem"><strong style="color:var(--accent-green)">NanoClaw</strong> gives you the best security-by-default experience. Containers are the architecture, not an add-on. The codebase is small enough that you (or Claude) can understand and modify all of it. The tradeoff is fewer features and Claude-only model support.</p>
+  <p style="margin-top:0.5rem"><strong style="color:var(--accent-blue)">OpenClaw</strong> is stronger than it first appears on Docker/safety. It supports <em>two layers</em> of containerization: (1) run the entire gateway + CLI in Docker via the official Docker Compose setup, and (2) enable agent sandboxing so individual tool executions get their own isolated containers on top of that. Combined, this gives you defense-in-depth — even if an agent escapes its sandbox, it lands in the gateway container, not on your host. The tradeoff is that this setup requires deliberate configuration (it's not the default), the CVE history and malicious skill ecosystem are real concerns, and full hardening (egress proxy, Tailscale, non-root) takes effort. But once hardened, you get a much richer feature set and a massive community.</p>
+  <p style="margin-top:0.5rem"><strong style="color:var(--accent-yellow)">PicoClaw</strong> is interesting for edge/IoT but is the weakest choice for your use case — minimal sandboxing and explicitly not production-ready on security.</p>
+  <p style="margin-top:1rem; color:var(--muted); font-size:0.9rem"><strong>Key question for your decision:</strong> Do you want to build features yourself on a secure foundation (NanoClaw), or spend time hardening a feature-rich platform (OpenClaw)?</p>
+</div>
+
+<p class="footer-note">Research compiled February 2026. Verify details against current project documentation before making decisions.</p>
+
+</body>
+</html>
